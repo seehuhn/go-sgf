@@ -18,11 +18,48 @@ package sgf
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
+
+func TestSimpleText(t *testing.T) {
+	cases := []struct {
+		in  string
+		out string
+	}{
+		{"", ""},
+		{"a", "a"},
+		{"This is a test.", "This is a test."},
+		{"a\nb", "a b"},
+		{"a\rb", "a b"},
+		{"a\n\rb", "a b"},
+		{"a\r\nb", "a b"},
+		{"a[\\]b", "a[]b"},
+		{"a\\:b", "a:b"},
+		{"a\\\nb", "ab"},
+		{"a\\\rb", "ab"},
+		{"a\\\n\rb", "ab"},
+		{"a\\\r\nb", "ab"},
+		{"a \n\r\t b", "a b"},
+	}
+	for i, test := range cases {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			n := &Node{
+				"TEST": []string{test.in},
+			}
+			got, err := n.GetSimpleText("TEST")
+			if err != nil {
+				t.Error(err)
+			}
+			if got != test.out {
+				t.Errorf("simpleText(%q) = %q, want %q", test.in, got, test.out)
+			}
+		})
+	}
+}
 
 func TestExamples(t *testing.T) {
 	for _, test := range examples {

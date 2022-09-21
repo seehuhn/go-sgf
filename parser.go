@@ -16,7 +16,25 @@
 
 package sgf
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
+
+// Read reads a collection of games from r.
+func Read(r io.Reader) (Collection, error) {
+	body, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := parse(string(body))
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
 
 type parser struct {
 	tokens  <-chan *token

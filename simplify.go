@@ -16,23 +16,22 @@
 
 package sgf
 
-// Simplify simplifies all game trees in the collection.
-func (c Collection) Simplify() {
+// SimplifyAll replaces all game trees in the collection with simplified
+// copies.
+func (c Collection) SimplifyAll() {
 	for i, g := range c {
-		c[i] = g.Simplify()
+		c[i] = g.Simplified()
 	}
 }
 
-// Simplify returns a simplified deep copy of the game tree.
-func (g *GameTree) Simplify() *GameTree {
+// Simplified returns a simplified deep copy of the game tree.
+func (g *GameTree) Simplified() *GameTree {
 	var nodes []Node
 	for {
 		for _, origNode := range g.Nodes {
 			n := Node{}
 			for key, val := range origNode {
-				if len(val) > 0 {
-					n[key] = val
-				}
+				n[key] = val
 			}
 			if len(n) == 0 {
 				continue
@@ -45,9 +44,12 @@ func (g *GameTree) Simplify() *GameTree {
 		g = g.Children[0]
 	}
 
-	children := make([]*GameTree, len(g.Children))
-	for i, child := range g.Children {
-		children[i] = child.Simplify()
+	var children []*GameTree
+	if len(g.Children) > 0 {
+		children = make([]*GameTree, len(g.Children))
+		for i, child := range g.Children {
+			children[i] = child.Simplified()
+		}
 	}
 	return &GameTree{
 		Nodes:    nodes,
