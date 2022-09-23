@@ -19,10 +19,21 @@ package sgf
 import (
 	"fmt"
 	"io"
+	"os"
 )
 
-// Read reads a collection of games from r.
-func Read(r io.Reader) (Collection, error) {
+func ParseFile(fileName string) (Collection, error) {
+	f, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return Parse(f)
+}
+
+// Parse reads a collection of games from r.
+func Parse(r io.Reader) (Collection, error) {
 	body, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err

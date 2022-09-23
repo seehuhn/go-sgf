@@ -64,7 +64,7 @@ func TestSimpleText(t *testing.T) {
 func TestExamples(t *testing.T) {
 	for _, test := range examples {
 		r := strings.NewReader(test)
-		_, err := Read(r)
+		_, err := Parse(r)
 		if err != nil {
 			t.Errorf("Read(%q) failed: %v", test, err)
 		}
@@ -72,7 +72,7 @@ func TestExamples(t *testing.T) {
 
 	for _, test := range counterExamples {
 		r := strings.NewReader(test)
-		_, err := Read(r)
+		_, err := Parse(r)
 		if err == nil {
 			t.Errorf("Read(%q) succeeded, want failure", test)
 		}
@@ -85,7 +85,7 @@ func FuzzSGF(f *testing.F) {
 	}
 	f.Fuzz(func(t *testing.T, a string) {
 		r := strings.NewReader(a)
-		c1, err := Read(r)
+		c1, err := Parse(r)
 		if err != nil {
 			return
 		}
@@ -96,7 +96,7 @@ func FuzzSGF(f *testing.F) {
 			t.Fatal(err)
 		}
 
-		c2, err := Read(buf)
+		c2, err := Parse(buf)
 		if err != nil {
 			t.Fatal(err)
 		}

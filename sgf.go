@@ -18,6 +18,7 @@ package sgf
 
 import (
 	"fmt"
+	"strconv"
 	"unicode"
 )
 
@@ -89,6 +90,35 @@ func (n Node) GetNumber(name string) (int, error) {
 // is returned.
 func (n Node) GetNumberDefault(name string, defaultValue int) (int, error) {
 	val, err := n.GetNumber(name)
+	if _, ok := err.(*missingError); ok {
+		return defaultValue, nil
+	}
+	return val, err
+}
+
+// GetReal returns the value of the property with the given name as a floating
+// point number.  If the property is missing, has more than one value, or the
+// value is not a valid number, an error is returned.
+func (n Node) GetReal(name string) (float64, error) {
+	str, err := n.getSingle(name)
+	if err != nil {
+		return 0, err
+	}
+
+	x, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		return 0, newErrorf("property %q has invalid value %q", name, str)
+	}
+
+	return x, nil
+}
+
+// GetRealDefault returns the value of the property with the given name as a
+// floating point number.  If the property is missing, the defaultValue is
+// returned. It the property has more than one value, or the value is not a
+// valid number, an error is returned.
+func (n Node) GetRealDefault(name string, defaultValue float64) (float64, error) {
+	val, err := n.GetReal(name)
 	if _, ok := err.(*missingError); ok {
 		return defaultValue, nil
 	}
