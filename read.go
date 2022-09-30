@@ -22,18 +22,19 @@ import (
 	"os"
 )
 
-func ParseFile(fileName string) (Collection, error) {
+// ReadFile reads a collection of games from the given file.
+func ReadFile(fileName string) (Collection, error) {
 	f, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	return Parse(f)
+	return Read(f)
 }
 
-// Parse reads a collection of games from r.
-func Parse(r io.Reader) (Collection, error) {
+// Read reads a collection of games from r.
+func Read(r io.Reader) (Collection, error) {
 	body, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -95,23 +96,27 @@ gameLoop:
 	return c, nil
 }
 
-func (p *parser) parseGameTree() (*GameTree, error) {
+func (p *parser) parseGameTree() (*Tree, error) {
 	err := p.require(tokenParenOpen, "GameTree")
 	if err != nil {
 		return nil, err
 	}
 
-	g := &GameTree{}
+	root := &Tree{}
+	tree := root
 
 	for {
 		n, err := p.parseNode()
 		if err != nil {
 			return nil, err
 		}
-		g.Nodes = append(g.Nodes, n)
+		tree.Properties = n
 		if p.peek().typ != tokenSemicolon {
 			break
 		}
+		child := &Tree{}
+		tree.Children = []*Tree{child}
+		tree = child
 	}
 
 childLoop:
@@ -125,7 +130,7 @@ childLoop:
 			if err != nil {
 				return nil, err
 			}
-			g.Children = append(g.Children, child)
+			tree.Children = append(tree.Children, child)
 		}
 	}
 
@@ -134,16 +139,16 @@ childLoop:
 		return nil, err
 	}
 
-	return g, nil
+	return root, nil
 }
 
-func (p *parser) parseNode() (Node, error) {
+func (p *parser) parseNode() (Properties, error) {
 	err := p.require(tokenSemicolon, "Node")
 	if err != nil {
 		return nil, err
 	}
 
-	n := make(Node)
+	n := make(Properties)
 	for {
 		t := p.next()
 		if t.typ != tokenPropIdent {

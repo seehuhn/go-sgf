@@ -47,7 +47,7 @@ func TestSimpleText(t *testing.T) {
 	}
 	for i, test := range cases {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			n := &Node{
+			n := &Properties{
 				"TEST": []string{test.in},
 			}
 			got, err := n.GetSimpleText("TEST")
@@ -64,7 +64,7 @@ func TestSimpleText(t *testing.T) {
 func TestExamples(t *testing.T) {
 	for _, test := range examples {
 		r := strings.NewReader(test)
-		_, err := Parse(r)
+		_, err := Read(r)
 		if err != nil {
 			t.Errorf("Read(%q) failed: %v", test, err)
 		}
@@ -72,7 +72,7 @@ func TestExamples(t *testing.T) {
 
 	for _, test := range counterExamples {
 		r := strings.NewReader(test)
-		_, err := Parse(r)
+		_, err := Read(r)
 		if err == nil {
 			t.Errorf("Read(%q) succeeded, want failure", test)
 		}
@@ -85,7 +85,7 @@ func FuzzSGF(f *testing.F) {
 	}
 	f.Fuzz(func(t *testing.T, a string) {
 		r := strings.NewReader(a)
-		c1, err := Parse(r)
+		c1, err := Read(r)
 		if err != nil {
 			return
 		}
@@ -96,7 +96,7 @@ func FuzzSGF(f *testing.F) {
 			t.Fatal(err)
 		}
 
-		c2, err := Parse(buf)
+		c2, err := Read(buf)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -35,10 +35,14 @@ func (c Collection) Write(w io.Writer) error {
 	return wb.Flush()
 }
 
-func (g *GameTree) write(w *bufio.Writer) {
+func (g *Tree) write(w *bufio.Writer) {
 	w.WriteRune('(')
-	for _, n := range g.Nodes {
-		n.write(w)
+	for {
+		g.Properties.write(w)
+		if len(g.Children) != 1 {
+			break
+		}
+		g = g.Children[0]
 	}
 	for _, c := range g.Children {
 		w.WriteRune('\n')
@@ -47,7 +51,7 @@ func (g *GameTree) write(w *bufio.Writer) {
 	w.WriteRune(')')
 }
 
-func (n Node) write(w *bufio.Writer) {
+func (n Properties) write(w *bufio.Writer) {
 	w.WriteRune(';')
 	keys := maps.Keys(n)
 	sort.Strings(keys)
