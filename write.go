@@ -25,45 +25,45 @@ import (
 )
 
 func (c Collection) Write(w io.Writer) error {
-	wb := bufio.NewWriter(w)
+	buf := bufio.NewWriter(w)
 
 	for _, g := range c {
-		g.write(wb)
+		g.write(buf)
 	}
 
-	wb.WriteRune('\n')
-	return wb.Flush()
+	_, _ = buf.WriteRune('\n')
+	return buf.Flush()
 }
 
-func (g *Tree) write(w *bufio.Writer) {
-	w.WriteRune('(')
+func (g *Tree) write(buf *bufio.Writer) {
+	_, _ = buf.WriteRune('(')
 	for {
-		g.Properties.write(w)
+		g.Properties.write(buf)
 		if len(g.Children) != 1 {
 			break
 		}
 		g = g.Children[0]
 	}
 	for _, c := range g.Children {
-		w.WriteRune('\n')
-		c.write(w)
+		_, _ = buf.WriteRune('\n')
+		c.write(buf)
 	}
-	w.WriteRune(')')
+	_, _ = buf.WriteRune(')')
 }
 
-func (n Properties) write(w *bufio.Writer) {
-	w.WriteRune(';')
+func (n Properties) write(buf *bufio.Writer) {
+	_, _ = buf.WriteRune(';')
 	keys := maps.Keys(n)
 	sort.Strings(keys)
 	for j, key := range keys {
 		if j > 0 {
-			w.WriteRune('\n')
+			_, _ = buf.WriteRune('\n')
 		}
-		w.WriteString(key)
+		_, _ = buf.WriteString(key)
 		for _, value := range n[key] {
-			w.WriteRune('[')
-			w.WriteString(value)
-			w.WriteRune(']')
+			_, _ = buf.WriteRune('[')
+			_, _ = buf.WriteString(value)
+			_, _ = buf.WriteRune(']')
 		}
 	}
 }
