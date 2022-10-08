@@ -15,5 +15,5 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Package sgf reads and writes Smart Game Format (SGF) files.
-// https://www.red-bean.com/sgf/sgf4.html
+// https://www.red-bean.com/sgf/index.html
 package sgf // import "seehuhn.de/go/sgf"
