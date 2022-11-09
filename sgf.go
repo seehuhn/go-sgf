@@ -59,6 +59,48 @@ func (t *Tree) MainVariation() []Properties {
 	return res
 }
 
+// MainVariationMoves returns the main variation of the game tree, as a
+// sequence of moves.  The moves are played alternatingly by black and white,
+// starting with black.  Any trailing passes present in the SGF file are
+// included.
+func (t *Tree) MainVariationMoves() ([]Move, error) {
+	b, err := t.GetBoardSize()
+	if err != nil {
+		return nil, err
+	}
+
+	var res []Move
+	next := 'B'
+	for {
+		props := t.Properties
+		black, bOk := props["B"]
+		white, wOk := props["W"]
+
+		if bOk && wOk {
+			return nil, newErrorf("both B and W are set")
+		} else if bOk {
+			if next != 'B' {
+				return nil, newErrorf("black played out of turn")
+			}
+			res = append(res, b.DecodeMove(black[0]))
+			next = 'W'
+		} else if wOk {
+			if next != 'W' {
+				return nil, newErrorf("white played out of turn")
+			}
+			res = append(res, b.DecodeMove(white[0]))
+			next = 'B'
+		}
+
+		res = append(res)
+		if len(t.Children) == 0 {
+			break
+		}
+		t = t.Children[0]
+	}
+	return res, nil
+}
+
 type sgfError struct {
 	msg string
 }

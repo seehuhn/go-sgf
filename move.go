@@ -5,14 +5,6 @@ import (
 	"strings"
 )
 
-// Move represents a move in a game of Go.
-// The coordinates are 0-based, with (0,0) being the top left corner.
-// If the move is a pass, X and Y are -1.
-type Move struct {
-	X int8 // column, 0-based, from left to right
-	Y int8 // row, 0-based, from bottom to top
-}
-
 type BoardSize struct {
 	Width  int
 	Height int
@@ -53,8 +45,16 @@ func (sz BoardSize) String() string {
 	return strconv.Itoa(sz.Width) + "x" + strconv.Itoa(sz.Height)
 }
 
+// Move represents a move in a game of Go.
+// The coordinates are 0-based, with (0,0) being the top left corner.
+// If the move is a pass, X and Y are -1.
+type Move struct {
+	X int8 // column, 0-based, from left to right
+	Y int8 // row, 0-based, from bottom to top
+}
+
 // in SGF, "aa" is the top left corner
-func (sz BoardSize) decodeSgfMove(sgfMove string) Move {
+func (sz BoardSize) DecodeMove(sgfMove string) Move {
 	if sgfMove == "" || (sz.Width <= 19 && sz.Height <= 19 && sgfMove == "tt") {
 		return Move{-1, -1}
 	}
@@ -69,7 +69,7 @@ func (sz BoardSize) decodeSgfMove(sgfMove string) Move {
 	return Move{int8(x), int8(y)}
 }
 
-func (sz BoardSize) encodeSgfMove(move Move) string {
+func (sz BoardSize) EncodeMove(move Move) string {
 	if move.X < 0 || move.Y < 0 {
 		return ""
 	}

@@ -26,3 +26,36 @@ func TestBoardSize(t *testing.T) {
 		}
 	}
 }
+
+func TestMove1(t *testing.T) {
+	mm := []Move{
+		{X: -1, Y: -1},
+	}
+	for x := int8(0); x < 19; x++ {
+		for y := int8(0); y < 19; y++ {
+			mm = append(mm, Move{X: x, Y: y})
+		}
+	}
+
+	b := BoardSize{19, 19}
+	for _, m := range mm {
+		m2 := b.DecodeMove(b.EncodeMove(m))
+		if m != m2 {
+			t.Errorf("move (%d,%d) != (%d,%d)", m.X, m.Y, m2.X, m2.Y)
+		}
+	}
+}
+
+func TestMove2(t *testing.T) {
+	mm := []string{
+		"", "aa", "ss", "as", "sa", "ij",
+	}
+	b := BoardSize{19, 19}
+	for _, s := range mm {
+		m := b.DecodeMove(s)
+		s2 := b.EncodeMove(m)
+		if s != s2 {
+			t.Errorf("move %q != %q", s, s2)
+		}
+	}
+}
